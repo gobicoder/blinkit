@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instore Performance Dashboard</title>
+
+  <!-- Icons & Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- SheetJS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #334155;
+      --primary: #6366f1;
+      --accent: #06b6d4;
+      --accent-green: #10b981;
+      --accent-gold: #f59e0b;
+      --accent-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; padding-bottom: 4rem; }
+
+    .glow-bg {
+      position: fixed; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+      top: -100px; left: 50%; transform: translateX(-50%);
+      z-index: 0; pointer-events: none; animation: pulseGlow 8s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { transform: translateX(-50%) scale(0.8); opacity: 0.5; }
+      100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+    }
+
+    .container { position: relative; z-index: 1; max-width: 1250px; margin: 0 auto; padding: 0 1.5rem; }
+
+    header {
+      padding: 2.5rem 0 1.5rem; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border-color); margin-bottom: 2rem;
+    }
+    .logo {
+      font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 0.75rem;
+      background: linear-gradient(135deg, #fff, var(--text-muted));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo i { color: var(--accent); -webkit-text-fill-color: initial; }
+
+    .header-actions {
+      display: flex; align-items: center; gap: 1.25rem;
+    }
+
+    /* Admin Profile Link */
+    .admin-profile {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
+      padding: 0.4rem 0.8rem; border-radius: 20px; color: var(--text-main);
+      text-decoration: none; font-size: 0.9rem; font-weight: 600;
+      transition: var(--transition);
+    }
+    .admin-profile:hover {
+      background: var(--bg-card-hover); border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .admin-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: #fff; font-weight: 700;
+    }
+
+    /* Compact Upload Box Container */
+    .upload-container {
+      max-width: 500px;
+      margin: 0 auto 2rem auto;
+    }
+
+    .upload-area {
+      background: var(--bg-card); border: 1.5px dashed var(--primary);
+      border-radius: 12px; padding: 1rem 1.5rem; text-align: center; cursor: pointer;
+      transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+    }
+    .upload-area:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+    .upload-icon { font-size: 1.5rem; color: var(--accent); }
+    .upload-text h3 { font-size: 0.95rem; font-weight: 600; }
+    .upload-text p { color: var(--text-muted); font-size: 0.75rem; }
+    #fileInput { display: none; }
+
+    /* Progress Bar Styles */
+    .progress-box {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 12px; padding: 1rem 1.5rem; display: none; flex-direction: column; gap: 0.5rem;
+    }
+    .progress-info {
+      display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600;
+    }
+    .progress-bar-bg {
+      width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 4px; transition: width 0.1s linear;
+    }
+
+    /* Hide Dashboard Data Initially */
+    .dashboard-data {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Summary Stats Grid (Top) */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 1.25rem 1.5rem; border-radius: 14px; display: flex; align-items: flex-start; gap: 1.25rem; }
+    .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .kpi-icon.blue { background: rgba(99, 102, 241, 0.15); color: var(--primary); }
+    .kpi-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+    .kpi-icon.gold { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); }
+    .kpi-icon.red { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+    .kpi-info { width: 100%; }
+    .kpi-info h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .kpi-info div.stat-value { font-size: 1.4rem; font-weight: 700; }
+
+    /* Lists inside Top/Worst PPI Cards */
+    .ppi-list { list-style: none; margin-top: 0.2rem; }
+    .ppi-list li {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.85rem; padding: 0.2rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .ppi-list li:last-child { border-bottom: none; }
+    .ppi-list .emp-name { max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .ppi-list .ppi-val { font-weight: 700; }
+
+    /* Highlights Grid Below Table */
+    .highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    /* Styled Tables */
+    .table-container {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .responsive-table { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+
+    /* Banner Styling */
+    .banner-title { 
+      background: linear-gradient(135deg, #4f46e5, #3b82f6); 
+      color: #ffffff; 
+      font-weight: 800; 
+      text-align: center; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      font-size: 1rem; 
+      padding: 0.8rem;
+    }
+    .banner-date { 
+      background: #0e7490; 
+      color: #38bdf8; 
+      font-weight: 700; 
+      text-align: center; 
+      font-size: 0.95rem; 
+      padding: 0.5rem;
+    }
+    .banner-columns th { 
+      background-color: #334155; 
+      color: #f8fafc; 
+      font-weight: 700; 
+      text-transform: uppercase; 
+      font-size: 0.85rem; 
+      border-bottom: 2px solid var(--primary);
+    }
+
+    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+
+    .btn-sample {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px;
+      font-weight: 600; cursor: pointer; transition: var(--transition);
+    }
+    .btn-sample:hover { opacity: 0.9; transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+
+  <div class="glow-bg"></div>
+
+  <div class="container">
+    <header>
+      <div class="logo"><i class="fa-solid fa-chart-line"></i> Instore Performance</div>
+      
+      <div class="header-actions">
+        <!-- Admin Profile Link -->
+        <a href="#profile" class="admin-profile" title="Admin Profile">
+          <div class="admin-avatar">G</div>
+          <span>Gobi</span>
+        </a>
+
+        <button class="btn-sample" onclick="loadSampleData()"><i class="fa-solid fa-wand-magic-sparkles"></i> Preview Sample Sheet</button>
+      </div>
+    </header>
+
+    <!-- Small Upload & Loading Box -->
+    <div class="upload-container">
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+        <i class="fa-solid fa-file-excel upload-icon"></i>
+        <div class="upload-text">
+          <h3>Upload Performance Sheet</h3>
+          <p>Click or drag & drop Excel file here</p>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx, .xls, .csv">
+      </div>
+
+      <!-- Loading Bar Component -->
+      <div class="progress-box" id="progressBox">
+        <div class="progress-info">
+          <span id="progressStatus">Uploading & Parsing...</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content Wrapper (Hidden until loaded 100%) -->
+    <div class="dashboard-data" id="dashboardData">
+      <!-- Summary Metrics (Top) -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon blue"><i class="fa-solid fa-boxes-stack"></i></div>
+          <div class="kpi-info">
+            <h4>Total Orders</h4>
+            <div class="stat-value" id="kpiOrders">0</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon gold"><i class="fa-solid fa-gauge-high"></i></div>
+          <div class="kpi-info">
+            <h4>Avg IPH</h4>
+            <div class="stat-value" id="kpiIPH">0</div>
+          </div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i class="fa-solid fa-circle-exclamation"></i></div>
+          <div class="kpi-info">
+            <h4>Total Complaints</h4>
+            <div class="stat-value" id="kpiComplaints">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Table Container -->
+      <div class="table-container">
+        <div class="responsive-table">
+          <table>
+            <thead>
+              <tr>
+                <th colspan="6" class="banner-title" id="bannerHeader">Yesterday Instore Performance</th>
+              </tr>
+              <tr>
+                <th colspan="6" class="banner-date" id="dateHeader">07-Aug</th>
+              </tr>
+              <tr class="banner-columns">
+                <th>Name</th>
+                <th>Employee ID</th>
+                <th>Orders</th>
+                <th>PPI </th>
+                <th>IPH</th>
+                <th>Complaints</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Top 3 & Worst 3 PPI Cards -->
+      <div class="highlights-grid">
+        <!-- Top 3 PPI Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i class="fa-solid fa-stopwatch"></i></div>
+          <div class="kpi-info">
+            <h4>Top 3 PPI (Fastest)</h4>
+            <ul class="ppi-list" id="topPpiList">
+              <li style="color: var(--text-muted);">No data</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Worst 3 PPI Card -->
+        <div class="kpi-card">
+          <div class="kpi-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="kpi-info">
+            <h4>Worst 3 PPI (Slowest)</h4>
+            <ul class="ppi-list" id="worstPpiList">
+              <li style="color: var(--text-muted);">No data</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentData = [];
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      if (e.target.files.length) {
+        const file = e.target.files[0];
+        startLoadingProcess(file);
+      }
+    });
+
+    function startLoadingProcess(file) {
+      const uploadArea = document.getElementById('uploadArea');
+      const progressBox = document.getElementById('progressBox');
+      const progressFill = document.getElementById('progressFill');
+      const progressPercent = document.getElementById('progressPercent');
+      const dashboardData = document.getElementById('dashboardData');
+
+      // Hide dashboard & show loading
+      dashboardData.style.display = 'none';
+      uploadArea.style.display = 'none';
+      progressBox.style.display = 'flex';
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        progressFill.style.width = progress + '%';
+        progressPercent.innerText = progress + '%';
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          
+          // Read file after loading animation completes
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            const data = new Uint8Array(evt.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            
+            const rawArray = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            processExcelArray(rawArray);
+
+            // Hide progress and reveal dashboard
+            progressBox.style.display = 'none';
+            uploadArea.style.display = 'flex';
+            dashboardData.style.display = 'block';
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      }, 50);
+    }
+
+    function processExcelArray(array) {
+      if (!array || array.length < 2) return;
+
+      let title = "Yesterday Instore Performance";
+      let date = "07-Aug";
+      let headerRowIndex = -1;
+
+      // Detect Title, Date and Header Row
+      for (let i = 0; i < array.length; i++) {
+        const rowStr = array[i].map(val => (val || '').toString().toLowerCase()).join(' ');
+
+        if (rowStr.includes('performance') && !rowStr.includes('name')) {
+          title = array[i].find(val => val) || title;
+        }
+        if ((rowStr.includes('aug') || rowStr.includes('jan') || rowStr.includes('feb') || rowStr.includes('-')) && !rowStr.includes('name')) {
+          date = array[i].find(val => val) || date;
+        }
+        if (rowStr.includes('name') && (rowStr.includes('employee') || rowStr.includes('emp') || rowStr.includes('picking') || rowStr.includes('orders'))) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+
+      if (headerRowIndex === -1) headerRowIndex = 0;
+
+      document.getElementById('bannerHeader').innerText = title;
+      document.getElementById('dateHeader').innerText = date;
+
+      const headerRow = array[headerRowIndex].map(h => (h || '').toString().trim().toLowerCase());
+
+      // Find column indices by mapping keywords dynamically
+      const getColIndex = (candidates) => headerRow.findIndex(h => candidates.some(c => h.includes(c)));
+
+      const idxName = getColIndex(['name']);
+      const idxEmpId = getColIndex(['employee id', 'employee', 'emp id', 'emp']);
+      const idxOrders = getColIndex(['no of orders', 'number of orders', 'orders']);
+      const idxPpi = getColIndex(['picking time per item', 'ppi', 'picking time']);
+      const idxIph = getColIndex(['item putaway per hour', 'iph', 'putaway']);
+      const idxComplaints = getColIndex(['no of complaints', 'complaints', 'complaint']);
+
+      currentData = [];
+      for (let i = headerRowIndex + 1; i < array.length; i++) {
+        const row = array[i];
+        if (row && row[idxName >= 0 ? idxName : 0] !== undefined) {
+          const nameVal = idxName >= 0 && row[idxName] !== undefined ? row[idxName] : '';
+          if (!nameVal) continue; // Skip empty rows
+
+          const empIdVal = idxEmpId >= 0 && row[idxEmpId] !== undefined ? row[idxEmpId] : '';
+          const ordersVal = idxOrders >= 0 && row[idxOrders] !== undefined ? parseInt(row[idxOrders]) || 0 : 0;
+          const iphVal = idxIph >= 0 && row[idxIph] !== undefined ? parseFloat(row[idxIph]) || 0 : 0;
+          const complaintsVal = idxComplaints >= 0 && row[idxComplaints] !== undefined ? parseInt(row[idxComplaints]) || 0 : 0;
+
+          let rawPpi = idxPpi >= 0 && row[idxPpi] !== undefined ? row[idxPpi].toString().trim() : '0';
+          const numericPpi = parseFloat(rawPpi.replace(/[^0-9.]/g, '')) || 0;
+
+          // HIDE logic: Ignore any row where PPI is 0 or less
+          if (numericPpi <= 0) continue;
+
+          if (!rawPpi.toLowerCase().includes('s')) {
+            rawPpi += 's';
+          }
+
+          currentData.push({
+            name: nameVal,
+            empId: empIdVal,
+            orders: ordersVal,
+            ppiRaw: rawPpi,
+            ppiNum: numericPpi,
+            iph: iphVal,
+            complaints: complaintsVal
+          });
+        }
+      }
+
+      // SORT DATA LOW TO HIGH BY PPI
+      currentData.sort((a, b) => a.ppiNum - b.ppiNum);
+
+      renderTable(currentData);
+      updateKPIs(currentData);
+    }
+
+    // PPI Threshold Dynamic Color Logic
+    function getPpiColor(val) {
+      if (val <= 12.0) {
+        return 'var(--accent-green)'; // <= 12 Green
+      } else if (val >= 12.1 && val <= 15.0) {
+        return 'var(--accent-gold)';  // 12.1 - 15 Yellow
+      } else {
+        return 'var(--accent-red)';   // >= 15.1 Red
+      }
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">No data available.</td></tr>`;
+        return;
+      }
+
+      data.forEach(item => {
+        const ppiColor = getPpiColor(item.ppiNum);
+        const tr = document.createElement('tr');
+
+        const complaintColor = item.complaints > 0 ? 'var(--accent-red)' : 'var(--text-muted)';
+
+        // Columns: Name, Employee ID, Orders, PPI, IPH, Complaints
+        tr.innerHTML = `
+          <td style="font-weight: 600;">${item.name}</td>
+          <td style="color: var(--text-muted);">${item.empId}</td>
+          <td>${item.orders}</td>
+          <td style="font-weight: 700; color: ${ppiColor};">${item.ppiRaw}</td>
+          <td>${item.iph}</td>
+          <td style="font-weight: 600; color: ${complaintColor};">${item.complaints}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function updateKPIs(data) {
+      const totalStaff = data.length;
+      const totalOrders = data.reduce((acc, row) => acc + row.orders, 0);
+      const totalComplaints = data.reduce((acc, row) => acc + row.complaints, 0);
+      const avgIPH = totalStaff ? (data.reduce((acc, row) => acc + row.iph, 0) / totalStaff).toFixed(1) : 0;
+
+      document.getElementById('kpiOrders').innerText = totalOrders.toLocaleString();
+      document.getElementById('kpiIPH').innerText = avgIPH;
+      document.getElementById('kpiComplaints').innerText = totalComplaints.toLocaleString();
+
+      // Top 3 & Worst 3 PPI List Update (Data is already sorted low to high)
+      const top3 = data.slice(0, 3);
+      const worst3 = data.slice(-3).reverse();
+
+      const topListEl = document.getElementById('topPpiList');
+      const worstListEl = document.getElementById('worstPpiList');
+
+      topListEl.innerHTML = top3.map(item => `
+        <li>
+          <span class="emp-name">${item.name}</span>
+          <span class="ppi-val" style="color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</span>
+        </li>
+      `).join('') || '<li style="color: var(--text-muted);">No data</li>';
+
+      worstListEl.innerHTML = worst3.map(item => `
+        <li>
+          <span class="emp-name">${item.name}</span>
+          <span class="ppi-val" style="color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</span>
+        </li>
+      `).join('') || '<li style="color: var(--text-muted);">No data</li>';
+    }
+
+    function loadSampleData() {
+      const sampleRaw = [
+        ["Yesterday Instore Performance"],
+        ["07-Aug"],
+        ["Name", "Employee Id", "Login Status", "LeaderBoard Points", "Experience", "No of orders", "No Of Complaints", "Picking Time Per Item", "Item putaway per hour"],
+        ["Chris Lee", "EMP-231", "Active", 210, "3 Mos", 95, 3, "18.4s", 60],
+        ["Jane Smith", "EMP-204", "Active", 450, "2 Yrs", 180, 0, "11.2s", 95],
+        ["John Doe", "EMP-201", "Active", 390, "3 Yrs", 145, 0, "13.5s", 82],
+        ["Emily Davis", "EMP-215", "Active", 420, "1.5 Yrs", 160, 1, "12.0s", 88],
+        ["Michael Brown", "EMP-209", "Active", 280, "6 Mos", 110, 1, "15.1s", 68],
+        ["Zero PPI User", "EMP-999", "Inactive", 0, "0 Yrs", 0, 0, "0s", 0],
+        ["Robert Wilson", "EMP-220", "Offline", 310, "1 Yr", 130, 2, "14.8s", 75]
+      ];
+
+      const uploadArea = document.getElementById('uploadArea');
+      const progressBox = document.getElementById('progressBox');
+      const progressFill = document.getElementById('progressFill');
+      const progressPercent = document.getElementById('progressPercent');
+      const dashboardData = document.getElementById('dashboardData');
+
+      dashboardData.style.display = 'none';
+      uploadArea.style.display = 'none';
+      progressBox.style.display = 'flex';
+
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        progressFill.style.width = progress + '%';
+        progressPercent.innerText = progress + '%';
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          processExcelArray(sampleRaw);
+          progressBox.style.display = 'none';
+          uploadArea.style.display = 'flex';
+          dashboardData.style.display = 'block';
+        }
+      }, 40);
+    }
+  </script>
+</body>
+</html>
