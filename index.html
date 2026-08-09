@@ -256,10 +256,10 @@
         </div>
 
         <div class="kpi-card">
-          <div class="kpi-icon gold"><i class="fa-solid fa-gauge-high"></i></div>
+          <div class="kpi-icon gold"><i class="fa-solid fa-stopwatch"></i></div>
           <div class="kpi-info">
-            <h4>Avg IPH</h4>
-            <div class="stat-value" id="kpiIPH">0</div>
+            <h4>Avg PPI</h4>
+            <div class="stat-value" id="kpiPPI">0s</div>
           </div>
         </div>
 
@@ -281,7 +281,7 @@
                 <th colspan="6" class="banner-title" id="bannerHeader">Yesterday Instore Performance</th>
               </tr>
               <tr>
-                <th colspan="6" class="banner-date" id="dateHeader">07-Aug</th>
+                <th colspan="6" class="banner-date" id="dateHeader"></th>
               </tr>
               <tr class="banner-columns">
                 <th>Name</th>
@@ -328,6 +328,21 @@
 
   <script>
     let currentData = [];
+
+    // Helper: Returns yesterday's date formatted as "DD-Mon" (e.g. "08-Aug")
+    function getYesterdayFormattedDate() {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const day = String(yesterday.getDate()).padStart(2, '0');
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[yesterday.getMonth()];
+      return `${day}-${month}`;
+    }
+
+    // Set initial date header automatically on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('dateHeader').innerText = getYesterdayFormattedDate();
+    });
 
     document.getElementById('fileInput').addEventListener('change', function(e) {
       if (e.target.files.length) {
@@ -382,7 +397,7 @@
       if (!array || array.length < 2) return;
 
       let title = "Yesterday Instore Performance";
-      let date = "07-Aug";
+      let date = getYesterdayFormattedDate();
       let headerRowIndex = -1;
 
       // Detect Title, Date and Header Row
@@ -502,10 +517,10 @@
       const totalStaff = data.length;
       const totalOrders = data.reduce((acc, row) => acc + row.orders, 0);
       const totalComplaints = data.reduce((acc, row) => acc + row.complaints, 0);
-      const avgIPH = totalStaff ? (data.reduce((acc, row) => acc + row.iph, 0) / totalStaff).toFixed(1) : 0;
+      const avgPPI = totalStaff ? (data.reduce((acc, row) => acc + row.ppiNum, 0) / totalStaff).toFixed(1) : 0;
 
       document.getElementById('kpiOrders').innerText = totalOrders.toLocaleString();
-      document.getElementById('kpiIPH').innerText = avgIPH;
+      document.getElementById('kpiPPI').innerText = `${avgPPI}s`;
       document.getElementById('kpiComplaints').innerText = totalComplaints.toLocaleString();
 
       // Top 3 & Worst 3 PPI List Update (Data is already sorted low to high)
@@ -533,7 +548,7 @@
     function loadSampleData() {
       const sampleRaw = [
         ["Yesterday Instore Performance"],
-        ["07-Aug"],
+        [getYesterdayFormattedDate()],
         ["Name", "Employee Id", "Login Status", "LeaderBoard Points", "Experience", "No of orders", "No Of Complaints", "Picking Time Per Item", "Item putaway per hour"],
         ["Chris Lee", "EMP-231", "Active", 210, "3 Mos", 95, 3, "18.4s", 60],
         ["Jane Smith", "EMP-204", "Active", 450, "2 Yrs", 180, 0, "11.2s", 95],
