@@ -24,18 +24,38 @@
       --accent-red: #ef4444;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --border-color: rgba(255, 255, 255, 0.1);
+      --border-color: rgba(255, 255, 255, 0.08);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --glow-color: rgba(99, 102, 241, 0.15);
+      --table-hover: rgba(255, 255, 255, 0.03);
+    }
+
+    /* Light Theme Overrides */
+    [data-theme="light"] {
+      --bg-dark: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-hover: #e2e8f0;
+      --primary: #4f46e5;
+      --accent: #0284c7;
+      --accent-green: #059669;
+      --accent-gold: #d97706;
+      --accent-red: #dc2626;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --glow-color: rgba(79, 70, 229, 0.1);
+      --table-hover: rgba(0, 0, 0, 0.02);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; padding-bottom: 4rem; }
+    body { background-color: var(--bg-dark); color: var(--text-main); line-height: 1.6; padding-bottom: 4rem; transition: background 0.3s ease, color 0.3s ease; }
 
     .glow-bg {
       position: fixed; width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+      background: radial-gradient(circle, var(--glow-color) 0%, rgba(0,0,0,0) 70%);
       top: -100px; left: 50%; transform: translateX(-50%);
       z-index: 0; pointer-events: none; animation: pulseGlow 8s infinite alternate;
+      transition: background 0.3s ease;
     }
     @keyframes pulseGlow {
       0% { transform: translateX(-50%) scale(0.8); opacity: 0.5; }
@@ -50,47 +70,62 @@
     }
     .logo {
       font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 0.75rem;
-      background: linear-gradient(135deg, #fff, var(--text-muted));
+      background: linear-gradient(135deg, var(--text-main), var(--text-muted));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
     .logo i { color: var(--accent); -webkit-text-fill-color: initial; }
 
     .header-actions {
-      display: flex; align-items: center; gap: 1.25rem;
+      display: flex; align-items: center; gap: 1rem;
     }
 
-    /* Admin Profile Link */
+    /* Theme Toggle Button */
+    .theme-toggle {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      width: 40px; height: 40px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; color: var(--text-main);
+      cursor: pointer; transition: var(--transition); font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .theme-toggle:hover {
+      background: var(--bg-card-hover); border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Admin Profile Linked Component */
     .admin-profile {
       display: flex; align-items: center; gap: 0.6rem;
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color);
-      padding: 0.4rem 0.8rem; border-radius: 20px; color: var(--text-main);
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      padding: 0.4rem 0.9rem 0.4rem 0.4rem; border-radius: 20px; color: var(--text-main);
       text-decoration: none; font-size: 0.9rem; font-weight: 600;
-      transition: var(--transition);
+      transition: var(--transition); box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .admin-profile:hover {
       background: var(--bg-card-hover); border-color: var(--primary);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
     }
     .admin-avatar {
-      width: 28px; height: 28px; border-radius: 50%;
+      width: 30px; height: 30px; border-radius: 50%;
       background: linear-gradient(135deg, var(--primary), var(--accent));
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; color: #fff; font-weight: 700;
+      font-size: 0.8rem; color: #fff;
     }
 
     /* Compact Upload Box Container */
     .upload-container {
       max-width: 500px;
       margin: 0 auto 2rem auto;
+      transition: var(--transition);
     }
 
     .upload-area {
       background: var(--bg-card); border: 1.5px dashed var(--primary);
-      border-radius: 12px; padding: 1rem 1.5rem; text-align: center; cursor: pointer;
+      border-radius: 14px; padding: 1.25rem 1.5rem; text-align: center; cursor: pointer;
       transition: var(--transition);
       display: flex; align-items: center; justify-content: center; gap: 1rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
-    .upload-area:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+    .upload-area:hover { background: var(--bg-card-hover); border-color: var(--accent); transform: translateY(-2px); }
     .upload-icon { font-size: 1.5rem; color: var(--accent); }
     .upload-text h3 { font-size: 0.95rem; font-weight: 600; }
     .upload-text p { color: var(--text-muted); font-size: 0.75rem; }
@@ -99,13 +134,14 @@
     /* Progress Bar Styles */
     .progress-box {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: 12px; padding: 1rem 1.5rem; display: none; flex-direction: column; gap: 0.5rem;
+      border-radius: 14px; padding: 1.25rem 1.5rem; display: none; flex-direction: column; gap: 0.5rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
     .progress-info {
       display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600;
     }
     .progress-bar-bg {
-      width: 100%; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;
+      width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden;
     }
     .progress-bar-fill {
       height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--accent));
@@ -113,115 +149,123 @@
     }
 
     /* Hide Dashboard Data Initially */
-    .dashboard-data {
-      display: none;
-      animation: fadeIn 0.5s ease-in-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .dashboard-data { display: none; }
+
+    @keyframes dashboardEntrance {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
-    /* Summary Stats Grid (Top) */
+    .dashboard-active {
+      animation: dashboardEntrance 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes rowSlideUp {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .table-row-animate {
+      animation: rowSlideUp 0.4s ease forwards;
+      opacity: 0;
+    }
+
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .kpi-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 1.25rem 1.5rem; border-radius: 14px; display: flex; align-items: flex-start; gap: 1.25rem; }
-    .kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+    .kpi-card { 
+      background: var(--bg-card); border: 1px solid var(--border-color); padding: 1.25rem 1.5rem; border-radius: 16px; display: flex; align-items: flex-start; gap: 1.25rem; 
+      transition: var(--transition);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    .kpi-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
     .kpi-icon.blue { background: rgba(99, 102, 241, 0.15); color: var(--primary); }
     .kpi-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
     .kpi-icon.gold { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); }
     .kpi-icon.red { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
 
     .kpi-info { width: 100%; }
-    .kpi-info h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; }
-    .kpi-info div.stat-value { font-size: 1.4rem; font-weight: 700; }
+    .kpi-info h4 { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem; letter-spacing: 0.5px; font-weight: 700; }
+    .kpi-info div.stat-value { font-size: 1.4rem; font-weight: 700; color: var(--text-main); }
 
-    /* Lists inside Top/Worst PPI Cards */
-    .ppi-list { list-style: none; margin-top: 0.2rem; }
+    .ppi-list { list-style: none; margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.5rem; }
     .ppi-list li {
       display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.85rem; padding: 0.2rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.85rem; padding: 0.5rem 0.75rem; border-radius: 10px;
+      background: var(--table-hover); border: 1px solid var(--border-color);
+      transition: var(--transition);
     }
-    .ppi-list li:last-child { border-bottom: none; }
-    .ppi-list .emp-name { max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-    .ppi-list .ppi-val { font-weight: 700; }
+    .ppi-list li:hover { background: var(--bg-card-hover); transform: translateX(3px); }
+    .ppi-list .emp-details { display: flex; align-items: center; gap: 0.6rem; }
+    .ppi-list .emp-name { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: var(--text-main); }
+    .ppi-list .ppi-val { font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 6px; background: rgba(255,255,255,0.05); }
 
-    /* Highlights Grid Below Table */
-    .highlights-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
+    .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
 
-    /* Styled Tables */
     .table-container {
       background: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     }
 
     .responsive-table { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; text-align: center; color: var(--text-main); }
+    .text-left { text-align: left !important; }
 
-    /* Banner Styling */
     .banner-title { 
       background: linear-gradient(135deg, #4f46e5, #3b82f6); 
-      color: #ffffff; 
-      font-weight: 800; 
-      text-align: center; 
-      text-transform: uppercase; 
-      letter-spacing: 1px; 
-      font-size: 1rem; 
-      padding: 0.8rem;
+      color: #ffffff !important; font-weight: 800; text-align: center; 
+      text-transform: uppercase; letter-spacing: 1px; font-size: 1rem; padding: 0.9rem;
     }
-    .banner-date { 
-      background: #0e7490; 
-      color: #38bdf8; 
-      font-weight: 700; 
-      text-align: center; 
-      font-size: 0.95rem; 
-      padding: 0.5rem;
-    }
+    .banner-date { background: #0e7490; color: #38bdf8 !important; font-weight: 700; text-align: center; font-size: 0.95rem; padding: 0.55rem; }
     .banner-columns th { 
-      background-color: #334155; 
-      color: #f8fafc; 
-      font-weight: 700; 
-      text-transform: uppercase; 
-      font-size: 0.85rem; 
-      border-bottom: 2px solid var(--primary);
+      background-color: var(--bg-card-hover); color: var(--text-main) !important; 
+      font-weight: 700; text-transform: uppercase; font-size: 0.85rem; 
+      border-bottom: 2px solid var(--primary); text-align: center !important;
     }
+    .banner-columns th i { margin-right: 0.4rem; color: var(--accent); }
 
-    tbody tr:hover { background: rgba(255, 255, 255, 0.03); }
+    tbody tr { transition: background 0.2s ease; }
+    tbody tr:hover { background: var(--table-hover); }
 
     .btn-sample {
       background: linear-gradient(135deg, var(--primary), var(--accent));
       color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px;
       font-weight: 600; cursor: pointer; transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     }
-    .btn-sample:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-sample:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
   </style>
 </head>
-<body>
+<body data-theme="dark">
 
   <div class="glow-bg"></div>
 
   <div class="container">
     <header>
-      <div class="logo"><i class="fa-solid fa-chart-line"></i> Instore Performance</div>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Day/Night Mode">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+        <div class="logo"><i class="fa-solid fa-chart-line"></i> Instore Performance</div>
+      </div>
       
       <div class="header-actions">
-        <!-- Admin Profile Link -->
-        <a href="#profile" class="admin-profile" title="Admin Profile">
-          <div class="admin-avatar">G</div>
-          <span>Gobi</span>
+        <!-- Admin Profile Component with Shield Icon, Name, and Link -->
+        <a href="www.linkedin.com/in/gobinathe" class="admin-profile" title="Admin Profile" target="_blank">
+          <div class="admin-avatar"><i class="fa-solid fa-user-shield"></i></div>
+          <span id="adminName">Gobi</span>
         </a>
 
         <button class="btn-sample" onclick="loadSampleData()"><i class="fa-solid fa-wand-magic-sparkles"></i> Preview Sample Sheet</button>
       </div>
     </header>
 
-    <!-- Small Upload & Loading Box -->
-    <div class="upload-container">
+    <!-- Compact Upload Box Container -->
+    <div class="upload-container" id="uploadContainer">
       <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
         <i class="fa-solid fa-file-excel upload-icon"></i>
         <div class="upload-text">
@@ -243,14 +287,13 @@
       </div>
     </div>
 
-    <!-- Dashboard Content Wrapper (Hidden until loaded 100%) -->
+    <!-- Dashboard Content Wrapper -->
     <div class="dashboard-data" id="dashboardData">
-      <!-- Summary Metrics (Top) -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon blue"><i class="fa-solid fa-boxes-stack"></i></div>
           <div class="kpi-info">
-            <h4>Total Orders</h4>
+            <h4><i class="fa-solid fa-box-archive"></i> Total Orders</h4>
             <div class="stat-value" id="kpiOrders">0</div>
           </div>
         </div>
@@ -258,7 +301,7 @@
         <div class="kpi-card">
           <div class="kpi-icon gold"><i class="fa-solid fa-stopwatch"></i></div>
           <div class="kpi-info">
-            <h4>Avg PPI</h4>
+            <h4><i class="fa-solid fa-clock"></i> Avg PPI</h4>
             <div class="stat-value" id="kpiPPI">0s</div>
           </div>
         </div>
@@ -266,7 +309,7 @@
         <div class="kpi-card">
           <div class="kpi-icon red"><i class="fa-solid fa-circle-exclamation"></i></div>
           <div class="kpi-info">
-            <h4>Total Complaints</h4>
+            <h4><i class="fa-solid fa-triangle-exclamation"></i> Total Complaints</h4>
             <div class="stat-value" id="kpiComplaints">0</div>
           </div>
         </div>
@@ -284,12 +327,12 @@
                 <th colspan="6" class="banner-date" id="dateHeader"></th>
               </tr>
               <tr class="banner-columns">
-                <th>Name</th>
-                <th>Employee ID</th>
-                <th>Orders</th>
-                <th>PPI </th>
-                <th>IPH</th>
-                <th>Complaints</th>
+                <th><i class="fa-solid fa-user"></i> Name</th>
+                <th><i class="fa-solid fa-id-badge"></i> Employee ID</th>
+                <th><i class="fa-solid fa-boxes-stacked"></i> Orders</th>
+                <th><i class="fa-solid fa-stopwatch"></i> PPI</th>
+                <th><i class="fa-solid fa-gauge-high"></i> IPH</th>
+                <th><i class="fa-solid fa-triangle-exclamation"></i> Complaints</th>
               </tr>
             </thead>
             <tbody id="tableBody">
@@ -298,56 +341,76 @@
         </div>
       </div>
 
-      <!-- Top 3 & Worst 3 PPI Cards -->
+      <!-- Highlights Grid -->
       <div class="highlights-grid">
-        <!-- Top 3 PPI Card -->
         <div class="kpi-card">
-          <div class="kpi-icon green"><i class="fa-solid fa-stopwatch"></i></div>
+          <div class="kpi-icon green"><i class="fa-solid fa-trophy"></i></div>
           <div class="kpi-info">
-            <h4>Top 3 PPI (Fastest)</h4>
+            <h4><i class="fa-solid fa-award"></i> Top 3 PPI (Fastest)</h4>
             <ul class="ppi-list" id="topPpiList">
-              <li style="color: var(--text-muted);">No data</li>
+              <li style="color: var(--text-muted); justify-content: center; border: none; background: transparent;">No data available</li>
             </ul>
           </div>
         </div>
 
-        <!-- Worst 3 PPI Card -->
         <div class="kpi-card">
           <div class="kpi-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
           <div class="kpi-info">
-            <h4>Worst 3 PPI (Slowest)</h4>
+            <h4><i class="fa-solid fa-triangle-exclamation"></i> Worst 3 PPI (Slowest)</h4>
             <ul class="ppi-list" id="worstPpiList">
-              <li style="color: var(--text-muted);">No data</li>
+              <li style="color: var(--text-muted); justify-content: center; border: none; background: transparent;">No data available</li>
             </ul>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 
   <script>
     let currentData = [];
 
-    // Helper: Returns yesterday's date formatted as "DD-Mon" (e.g. "08-Aug")
+    const ADMIN_CONFIG = {
+      name: "Gobi"
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('dateHeader').innerText = getYesterdayFormattedDate();
+      document.getElementById('adminName').innerText = ADMIN_CONFIG.name;
+      
+      const savedTheme = localStorage.getItem('dashboard_theme') || 'dark';
+      setTheme(savedTheme);
+    });
+
+    function setTheme(theme) {
+      const body = document.body;
+      const themeIcon = document.getElementById('themeIcon');
+      
+      body.setAttribute('data-theme', theme);
+      localStorage.setItem('dashboard_theme', theme);
+
+      if (theme === 'light') {
+        themeIcon.className = 'fa-solid fa-sun';
+      } else {
+        themeIcon.className = 'fa-solid fa-moon';
+      }
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.body.getAttribute('data-theme');
+      setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
     function getYesterdayFormattedDate() {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const day = String(yesterday.getDate()).padStart(2, '0');
       const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const month = monthNames[yesterday.getMonth()];
-      return `${day}-${month}`;
+      return `${day}-${monthNames[yesterday.getMonth()]}`;
     }
-
-    // Set initial date header automatically on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('dateHeader').innerText = getYesterdayFormattedDate();
-    });
 
     document.getElementById('fileInput').addEventListener('change', function(e) {
       if (e.target.files.length) {
-        const file = e.target.files[0];
-        startLoadingProcess(file);
+        startLoadingProcess(e.target.files[0]);
       }
     });
 
@@ -356,10 +419,11 @@
       const progressBox = document.getElementById('progressBox');
       const progressFill = document.getElementById('progressFill');
       const progressPercent = document.getElementById('progressPercent');
+      const uploadContainer = document.getElementById('uploadContainer');
       const dashboardData = document.getElementById('dashboardData');
 
-      // Hide dashboard & show loading
       dashboardData.style.display = 'none';
+      dashboardData.classList.remove('dashboard-active');
       uploadArea.style.display = 'none';
       progressBox.style.display = 'flex';
 
@@ -371,22 +435,16 @@
 
         if (progress >= 100) {
           clearInterval(interval);
-          
-          // Read file after loading animation completes
           const reader = new FileReader();
           reader.onload = function(evt) {
             const data = new Uint8Array(evt.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
-            const sheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[sheetName];
-            
-            const rawArray = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            processExcelArray(rawArray);
+            processExcelArray(XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 }));
 
-            // Hide progress and reveal dashboard
-            progressBox.style.display = 'none';
-            uploadArea.style.display = 'flex';
+            uploadContainer.style.display = 'none';
             dashboardData.style.display = 'block';
+            void dashboardData.offsetWidth;
+            dashboardData.classList.add('dashboard-active');
           };
           reader.readAsArrayBuffer(file);
         }
@@ -395,35 +453,23 @@
 
     function processExcelArray(array) {
       if (!array || array.length < 2) return;
+      let title = "Yesterday Instore Performance", date = getYesterdayFormattedDate(), headerRowIndex = -1;
 
-      let title = "Yesterday Instore Performance";
-      let date = getYesterdayFormattedDate();
-      let headerRowIndex = -1;
-
-      // Detect Title, Date and Header Row
       for (let i = 0; i < array.length; i++) {
         const rowStr = array[i].map(val => (val || '').toString().toLowerCase()).join(' ');
-
-        if (rowStr.includes('performance') && !rowStr.includes('name')) {
-          title = array[i].find(val => val) || title;
-        }
-        if ((rowStr.includes('aug') || rowStr.includes('jan') || rowStr.includes('feb') || rowStr.includes('-')) && !rowStr.includes('name')) {
-          date = array[i].find(val => val) || date;
-        }
-        if (rowStr.includes('name') && (rowStr.includes('employee') || rowStr.includes('emp') || rowStr.includes('picking') || rowStr.includes('orders'))) {
+        if (rowStr.includes('performance') && !rowStr.includes('name')) title = array[i].find(val => val) || title;
+        if ((rowStr.includes('aug') || rowStr.includes('jan') || rowStr.includes('-')) && !rowStr.includes('name')) date = array[i].find(val => val) || date;
+        if (rowStr.includes('name') && (rowStr.includes('employee') || rowStr.includes('emp') || rowStr.includes('orders'))) {
           headerRowIndex = i;
           break;
         }
       }
-
       if (headerRowIndex === -1) headerRowIndex = 0;
 
       document.getElementById('bannerHeader').innerText = title;
       document.getElementById('dateHeader').innerText = date;
 
       const headerRow = array[headerRowIndex].map(h => (h || '').toString().trim().toLowerCase());
-
-      // Find column indices by mapping keywords dynamically
       const getColIndex = (candidates) => headerRow.findIndex(h => candidates.some(c => h.includes(c)));
 
       const idxName = getColIndex(['name']);
@@ -438,7 +484,7 @@
         const row = array[i];
         if (row && row[idxName >= 0 ? idxName : 0] !== undefined) {
           const nameVal = idxName >= 0 && row[idxName] !== undefined ? row[idxName] : '';
-          if (!nameVal) continue; // Skip empty rows
+          if (!nameVal) continue;
 
           const empIdVal = idxEmpId >= 0 && row[idxEmpId] !== undefined ? row[idxEmpId] : '';
           const ordersVal = idxOrders >= 0 && row[idxOrders] !== undefined ? parseInt(row[idxOrders]) || 0 : 0;
@@ -447,67 +493,43 @@
 
           let rawPpi = idxPpi >= 0 && row[idxPpi] !== undefined ? row[idxPpi].toString().trim() : '0';
           const numericPpi = parseFloat(rawPpi.replace(/[^0-9.]/g, '')) || 0;
-
-          // HIDE logic: Ignore any row where PPI is 0 or less
           if (numericPpi <= 0) continue;
+          if (!rawPpi.toLowerCase().includes('s')) rawPpi += 's';
 
-          if (!rawPpi.toLowerCase().includes('s')) {
-            rawPpi += 's';
-          }
-
-          currentData.push({
-            name: nameVal,
-            empId: empIdVal,
-            orders: ordersVal,
-            ppiRaw: rawPpi,
-            ppiNum: numericPpi,
-            iph: iphVal,
-            complaints: complaintsVal
-          });
+          currentData.push({ name: nameVal, empId: empIdVal, orders: ordersVal, ppiRaw: rawPpi, ppiNum: numericPpi, iph: iphVal, complaints: complaintsVal });
         }
       }
 
-      // SORT DATA LOW TO HIGH BY PPI
       currentData.sort((a, b) => a.ppiNum - b.ppiNum);
-
       renderTable(currentData);
       updateKPIs(currentData);
     }
 
-    // PPI Threshold Dynamic Color Logic
     function getPpiColor(val) {
-      if (val <= 12.0) {
-        return 'var(--accent-green)'; // <= 12 Green
-      } else if (val >= 12.1 && val <= 15.0) {
-        return 'var(--accent-gold)';  // 12.1 - 15 Yellow
-      } else {
-        return 'var(--accent-red)';   // >= 15.1 Red
-      }
+      if (val <= 12.0) return 'var(--accent-green)';
+      else if (val <= 15.0) return 'var(--accent-gold)';
+      else return 'var(--accent-red)';
     }
 
     function renderTable(data) {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
-
       if (data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 3rem;">No data available.</td></tr>`;
         return;
       }
 
-      data.forEach(item => {
-        const ppiColor = getPpiColor(item.ppiNum);
+      data.forEach((item, index) => {
         const tr = document.createElement('tr');
-
-        const complaintColor = item.complaints > 0 ? 'var(--accent-red)' : 'var(--text-muted)';
-
-        // Columns: Name, Employee ID, Orders, PPI, IPH, Complaints
+        tr.className = 'table-row-animate';
+        tr.style.animationDelay = `${0.1 + (index * 0.05)}s`;
         tr.innerHTML = `
-          <td style="font-weight: 600;">${item.name}</td>
+          <td class="text-left" style="font-weight: 600;"><i class="fa-solid fa-user-circle" style="color: var(--primary); margin-right: 6px;"></i>${item.name}</td>
           <td style="color: var(--text-muted);">${item.empId}</td>
           <td>${item.orders}</td>
-          <td style="font-weight: 700; color: ${ppiColor};">${item.ppiRaw}</td>
+          <td style="font-weight: 700; color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</td>
           <td>${item.iph}</td>
-          <td style="font-weight: 600; color: ${complaintColor};">${item.complaints}</td>
+          <td style="font-weight: 600; color: ${item.complaints > 0 ? 'var(--accent-red)' : 'var(--text-muted)'};">${item.complaints}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -523,26 +545,16 @@
       document.getElementById('kpiPPI').innerText = `${avgPPI}s`;
       document.getElementById('kpiComplaints').innerText = totalComplaints.toLocaleString();
 
-      // Top 3 & Worst 3 PPI List Update (Data is already sorted low to high)
       const top3 = data.slice(0, 3);
       const worst3 = data.slice(-3).reverse();
 
-      const topListEl = document.getElementById('topPpiList');
-      const worstListEl = document.getElementById('worstPpiList');
+      document.getElementById('topPpiList').innerHTML = top3.map(item => `
+        <li><div class="emp-details"><span class="emp-name">${item.name}</span></div><span class="ppi-val" style="color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</span></li>
+      `).join('') || '<li style="color: var(--text-muted); justify-content: center; border: none; background: transparent;">No data available</li>';
 
-      topListEl.innerHTML = top3.map(item => `
-        <li>
-          <span class="emp-name">${item.name}</span>
-          <span class="ppi-val" style="color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</span>
-        </li>
-      `).join('') || '<li style="color: var(--text-muted);">No data</li>';
-
-      worstListEl.innerHTML = worst3.map(item => `
-        <li>
-          <span class="emp-name">${item.name}</span>
-          <span class="ppi-val" style="color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</span>
-        </li>
-      `).join('') || '<li style="color: var(--text-muted);">No data</li>';
+      document.getElementById('worstPpiList').innerHTML = worst3.map(item => `
+        <li><div class="emp-details"><span class="emp-name">${item.name}</span></div><span class="ppi-val" style="color: ${getPpiColor(item.ppiNum)};">${item.ppiRaw}</span></li>
+      `).join('') || '<li style="color: var(--text-muted); justify-content: center; border: none; background: transparent;">No data available</li>';
     }
 
     function loadSampleData() {
@@ -554,33 +566,33 @@
         ["Jane Smith", "EMP-204", "Active", 450, "2 Yrs", 180, 0, "11.2s", 95],
         ["John Doe", "EMP-201", "Active", 390, "3 Yrs", 145, 0, "13.5s", 82],
         ["Emily Davis", "EMP-215", "Active", 420, "1.5 Yrs", 160, 1, "12.0s", 88],
-        ["Michael Brown", "EMP-209", "Active", 280, "6 Mos", 110, 1, "15.1s", 68],
-        ["Zero PPI User", "EMP-999", "Inactive", 0, "0 Yrs", 0, 0, "0s", 0],
-        ["Robert Wilson", "EMP-220", "Offline", 310, "1 Yr", 130, 2, "14.8s", 75]
+        ["Michael Brown", "EMP-209", "Active", 280, "6 Mos", 110, 1, "15.1s", 68]
       ];
 
       const uploadArea = document.getElementById('uploadArea');
       const progressBox = document.getElementById('progressBox');
-      const progressFill = document.getElementById('progressFill');
-      const progressPercent = document.getElementById('progressPercent');
+      const uploadContainer = document.getElementById('uploadContainer');
       const dashboardData = document.getElementById('dashboardData');
 
       dashboardData.style.display = 'none';
+      dashboardData.classList.remove('dashboard-active');
       uploadArea.style.display = 'none';
       progressBox.style.display = 'flex';
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 10;
-        progressFill.style.width = progress + '%';
-        progressPercent.innerText = progress + '%';
+        progress += 20;
+        document.getElementById('progressFill').style.width = progress + '%';
+        document.getElementById('progressPercent').innerText = progress + '%';
 
         if (progress >= 100) {
           clearInterval(interval);
           processExcelArray(sampleRaw);
           progressBox.style.display = 'none';
-          uploadArea.style.display = 'flex';
+          uploadContainer.style.display = 'none';
           dashboardData.style.display = 'block';
+          void dashboardData.offsetWidth;
+          dashboardData.classList.add('dashboard-active');
         }
       }, 40);
     }
