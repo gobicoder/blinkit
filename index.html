@@ -66,7 +66,7 @@
 
     header {
       padding: 2.5rem 0 1.5rem; display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid var(--border-color); margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
     }
     .logo {
       font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 0.75rem;
@@ -76,20 +76,29 @@
     .logo i { color: var(--accent); -webkit-text-fill-color: initial; }
 
     .header-actions {
-      display: flex; align-items: center; gap: 1rem;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
     }
 
-    /* Theme Toggle Button */
-    .theme-toggle {
+    /* Theme Toggle Button & Icon-Only Sample Button */
+    .theme-toggle, .btn-sample-icon {
       background: var(--bg-card); border: 1px solid var(--border-color);
       width: 40px; height: 40px; border-radius: 50%; display: flex;
       align-items: center; justify-content: center; color: var(--text-main);
       cursor: pointer; transition: var(--transition); font-size: 1rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
-    .theme-toggle:hover {
+    .theme-toggle:hover, .btn-sample-icon:hover {
       background: var(--bg-card-hover); border-color: var(--primary);
       transform: translateY(-2px);
+    }
+    .btn-sample-icon {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white; border: none;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+    .btn-sample-icon:hover {
+      opacity: 0.9;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
     }
 
     /* Admin Profile Linked Component */
@@ -127,6 +136,7 @@
     }
     .upload-area:hover { background: var(--bg-card-hover); border-color: var(--accent); transform: translateY(-2px); }
     .upload-icon { font-size: 1.5rem; color: var(--accent); }
+    .upload-text { text-align: left; }
     .upload-text h3 { font-size: 0.95rem; font-weight: 600; }
     .upload-text p { color: var(--text-muted); font-size: 0.75rem; }
     #fileInput { display: none; }
@@ -170,7 +180,7 @@
       opacity: 0;
     }
 
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
     .kpi-card { 
       background: var(--bg-card); border: 1px solid var(--border-color); padding: 1.25rem 1.5rem; border-radius: 16px; display: flex; align-items: flex-start; gap: 1.25rem; 
       transition: var(--transition);
@@ -199,9 +209,9 @@
       transition: var(--transition);
     }
     .ppi-list li:hover { background: var(--bg-card-hover); transform: translateX(3px); }
-    .ppi-list .emp-details { display: flex; align-items: center; gap: 0.6rem; }
+    .ppi-list .emp-details { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
     .ppi-list .emp-name { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: var(--text-main); }
-    .ppi-list .ppi-val { font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 6px; background: rgba(255,255,255,0.05); }
+    .ppi-list .ppi-val { font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 6px; background: rgba(255,255,255,0.05); flex-shrink: 0; }
 
     .highlights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
 
@@ -210,9 +220,9 @@
       border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
     }
 
-    .responsive-table { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; text-align: center; color: var(--text-main); }
+    .responsive-table { overflow-x: auto; width: 100%; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th, td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); text-align: center; color: var(--text-main); }
     .text-left { text-align: left !important; }
 
     .banner-title { 
@@ -226,18 +236,11 @@
       font-weight: 700; text-transform: uppercase; font-size: 0.85rem; 
       border-bottom: 2px solid var(--primary); text-align: center !important;
     }
+    .banner-columns th.text-left { text-align: left !important; }
     .banner-columns th i { margin-right: 0.4rem; color: var(--accent); }
 
     tbody tr { transition: background 0.2s ease; }
     tbody tr:hover { background: var(--table-hover); }
-
-    .btn-sample {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 20px;
-      font-weight: 600; cursor: pointer; transition: var(--transition);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    }
-    .btn-sample:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
   </style>
 </head>
 <body data-theme="dark">
@@ -247,20 +250,25 @@
   <div class="container">
     <header>
       <div style="display: flex; align-items: center; gap: 1rem;">
-        <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Day/Night Mode">
-          <i class="fa-solid fa-moon" id="themeIcon"></i>
-        </button>
         <div class="logo"><i class="fa-solid fa-chart-line"></i> Instore Performance</div>
       </div>
       
       <div class="header-actions">
-        <!-- Admin Profile Component with Shield Icon, Name, and Link -->
-        <a href="https://in.linkedin.com/in/gobinathe" class="admin-profile" title="Admin Profile" target="_blank">
+        <!-- Admin Profile Component -->
+        <a href="https://in.linkedin.com/in/gobinathe" class="admin-profile" title="Admin Profile">
           <div class="admin-avatar"><i class="fa-solid fa-user-shield"></i></div>
           <span id="adminName">Gobinath Inv Exec</span>
         </a>
 
-        <button class="btn-sample" onclick="loadSampleData()"><i class="fa-solid fa-wand-magic-sparkles"></i> Preview Sample Sheet</button>
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Day/Night Mode">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+
+        <!-- Preview Sample Sheet Icon-Only Button -->
+        <button class="btn-sample-icon" onclick="loadSampleData()" title="Preview Sample Sheet">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </button>
       </div>
     </header>
 
@@ -327,7 +335,7 @@
                 <th colspan="6" class="banner-date" id="dateHeader"></th>
               </tr>
               <tr class="banner-columns">
-                <th><i class="fa-solid fa-user"></i> Name</th>
+                <th class="text-left"><i class="fa-solid fa-user"></i> Name</th>
                 <th><i class="fa-solid fa-id-badge"></i> Employee ID</th>
                 <th><i class="fa-solid fa-boxes-stacked"></i> Orders</th>
                 <th><i class="fa-solid fa-stopwatch"></i> PPI</th>
@@ -370,7 +378,7 @@
     let currentData = [];
 
     const ADMIN_CONFIG = {
-      name: "Gobi"
+      name: "Gobinath Inv Exec"
     };
 
     document.addEventListener('DOMContentLoaded', () => {
